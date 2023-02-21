@@ -35,15 +35,23 @@ sudo nano /etc/hosts
 - If you want to change the domain address, you can edit it in container-files/config/vhosts/default.conf. You should also edit the hosts file.
 
 - configure .env as needed
-- Run the `docker-compose up -d`.
+- Run the `docker compose up -d`.
 
 ```shell
 git clone https://github.com/ugurakcil/docker-compose-lamp.git
 cd docker-compose-lamp/
 cp sample.env .env
 // modify sample.env as needed
-docker-compose up -d
-// visit localhost
+docker compose up -d
+// visit dslamp.my
+```
+
+Stop and remove
+```shell
+# show docker id's
+docker ps
+docker stop dslamp-mysql8 dslamp-php81 dslamp-phpmyadmin dslamp-redis
+docker rm dslamp-mysql8 dslamp-php81 dslamp-phpmyadmin dslamp-redis
 ```
 
 Your LAMP stack is now ready!! You can access it via `http://localhost`.
