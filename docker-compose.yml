@@ -3,43 +3,43 @@ version: "3"
 services:
   webserver:
     build:
-      context: ${CONTAINER_FILES}/bin/${PHPVERSION}
-    container_name: "${COMPOSE_PROJECT_NAME}-${PHPVERSION}"
+      context: ${CONTAINER_FILES-./container-files}/bin/${PHPVERSION-php81}
+    container_name: "${APP_NAME}-${PHPVERSION-php81}"
     restart: "always"
     ports:
-      - "${HOST_MACHINE_UNSECURE_HOST_PORT}:80"
-      - "${HOST_MACHINE_SECURE_HOST_PORT}:443"
+      - "${HOST_MACHINE_UNSECURE_HOST_PORT-80}:80"
+      - "${HOST_MACHINE_SECURE_HOST_PORT-443}:443"
     links:
       - database
     volumes:
-      - ${DOCUMENT_ROOT-./public_html}:/var/www/html:rw
-      - ${CONTAINER_FILES}/${PHP_INI-config/php/php.ini}:/usr/local/etc/php/php.ini
-      - ${CONTAINER_FILES}/${SSL_DIR-config/ssl}:/etc/apache2/ssl/
-      - ${CONTAINER_FILES}/${VHOSTS_DIR-config/vhosts}:/etc/apache2/sites-enabled
-      - ${CONTAINER_FILES}/${LOG_DIR-logs/apache2}:/var/log/apache2
-      - ${CONTAINER_FILES}/${XDEBUG_LOG_DIR-logs/xdebug}:/var/log/xdebug
+      - ${DOCUMENT_ROOT-./}:/var/www/html:rw
+      - ${CONTAINER_FILES-./container-files}/${PHP_INI-config/php/php.ini}:/usr/local/etc/php/php.ini
+      - ${CONTAINER_FILES-./container-files}/${SSL_DIR-config/ssl}:/etc/apache2/ssl/
+      - ${CONTAINER_FILES-./container-files}/${VHOSTS_DIR-config/vhosts}:/etc/apache2/sites-enabled
+      - ${CONTAINER_FILES-./container-files}/${LOG_DIR-logs/apache2}:/var/log/apache2
+      - ${CONTAINER_FILES-./container-files}/${XDEBUG_LOG_DIR-logs/xdebug}:/var/log/xdebug
     environment:
-      APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT-/var/www/html}
-      PMA_PORT: ${HOST_MACHINE_PMA_PORT}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT-/var/www/html/public_html}
+      PMA_PORT: ${HOST_MACHINE_PMA_PORT-8080}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD-lion}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      HOST_MACHINE_MYSQL_PORT: ${HOST_MACHINE_MYSQL_PORT}
-      XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT}"
+      HOST_MACHINE_MYSQL_PORT: ${DB_PORT-3306}
+      XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT-9003}"
     extra_hosts:
       - "host.docker.internal:host-gateway"
   database:
     build:
-      context: "${CONTAINER_FILES}/bin/${DATABASE}"
-    container_name: "${COMPOSE_PROJECT_NAME}-${DATABASE}"
+      context: "${CONTAINER_FILES-./container-files}/bin/${DATABASE}"
+    container_name: "${APP_NAME}-${DATABASE}"
     restart: "always"
     ports:
-      - "127.0.0.1:${HOST_MACHINE_MYSQL_PORT}:3306"
+      - "127.0.0.1:${DB_PORT-3306}:3306"
     volumes:
-      - ${CONTAINER_FILES}/${MYSQL_INITDB_DIR-config/initdb}:/docker-entrypoint-initdb.d
-      - ${CONTAINER_FILES}/${MYSQL_DATA_DIR-data/mysql}:/var/lib/mysql
-      - ${CONTAINER_FILES}/${MYSQL_LOG_DIR-logs/mysql}:/var/log/mysql
+      - ${CONTAINER_FILES-./container-files}/${MYSQL_INITDB_DIR-config/initdb}:/docker-entrypoint-initdb.d
+      - ${CONTAINER_FILES-./container-files}/${MYSQL_DATA_DIR-data/mysql}:/var/lib/mysql
+      - ${CONTAINER_FILES-./container-files}/${MYSQL_LOG_DIR-logs/mysql}:/var/log/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -47,12 +47,12 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
   phpmyadmin:
     image: phpmyadmin
-    container_name: "${COMPOSE_PROJECT_NAME}-phpmyadmin"
+    container_name: "${APP_NAME}-phpmyadmin"
     links:
       - database
     environment:
       PMA_HOST: database
-      PMA_PORT: 3306
+      PMA_PORT: ${DB_PORT-3306}
       PMA_USER: root
       PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -61,13 +61,13 @@ services:
       UPLOAD_LIMIT: ${UPLOAD_LIMIT}
       MEMORY_LIMIT: ${MEMORY_LIMIT}
     ports:
-      - "${HOST_MACHINE_PMA_PORT}:80"
-      - "${HOST_MACHINE_PMA_SECURE_PORT}:443"
+      - "${HOST_MACHINE_PMA_PORT-80}:80"
+      - "${HOST_MACHINE_PMA_SECURE_PORT-443}:443"
     volumes:
       - /sessions
-      - ${CONTAINER_FILES}/${PHP_INI-config/php/php.ini}:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
+      - ${CONTAINER_FILES-./container-files}/${PHP_INI-config/php/php.ini}:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
   redis:
-    container_name: "${COMPOSE_PROJECT_NAME}-redis"
+    container_name: "${APP_NAME}-redis"
     image: redis:latest
     ports:
-      - "127.0.0.1:${HOST_MACHINE_REDIS_PORT}:6379"
+      - "127.0.0.1:${HOST_MACHINE_REDIS_PORT-6379}:6379"
