@@ -24,11 +24,21 @@ As of now, we have several different PHP versions. Use appropriate php version a
 ## Installation
 
 - Clone this repository on your local computer
+- Create vhost local domain
+
+```shell
+sudo nano /etc/hosts
+# Add to end;
+127.0.0.1  dslamp.my
+```
+
+- If you want to change the domain address, you can edit it in container-files/config/vhosts/default.conf. You should also edit the hosts file.
+
 - configure .env as needed
 - Run the `docker-compose up -d`.
 
 ```shell
-git clone https://github.com/sprintcube/docker-compose-lamp.git
+git clone https://github.com/ugurakcil/docker-compose-lamp.git
 cd docker-compose-lamp/
 cp sample.env .env
 // modify sample.env as needed
@@ -170,7 +180,7 @@ phpMyAdmin is configured to run on port 8080. Use following default credentials.
 
 http://localhost:8080/  
 username: root  
-password: tiger
+password: lion
 
 ## Xdebug
 
