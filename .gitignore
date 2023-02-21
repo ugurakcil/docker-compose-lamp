@@ -1,8 +1,8 @@
-/.env
-/.vscode
-/config/*
-/data/*
-/logs/*
-/www/**
+.env
+.vscode
+*/config/*
+*/data/*
+*/logs/*
+*/public_html/**
 .DS_Store
-/buildtest
+*/buildtest
